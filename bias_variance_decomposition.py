@@ -40,7 +40,7 @@ def make_poly(x, D):
             X[:, d] = (X[:, d] - X[:, d].mean()) / X[:, d].std()
     return X
 
-
+#Create a sin(x) dataset.
 def sin_dataset():
     X = np.linspace(-np.pi, np.pi, n_total)
     fx = np.sin(X)
@@ -48,6 +48,7 @@ def sin_dataset():
     X_poly = make_poly(X, max_poly)
     return X_poly, fx;
 
+#Create n_trials sets of measurements over fx
 def make_target_sets(fx):
     target_sets = np.zeros((n_total, n_trials))
     noise = np.zeros((n_total, n_trials))
@@ -56,6 +57,7 @@ def make_target_sets(fx):
         target_sets[:, k] = fx + noise[:, k]
     return noise, target_sets;
 
+#Train models for each target set and model complexity d
 def train_models(X_poly, target_sets):
     train_scores = np.zeros((n_trials, max_poly))
     test_scores = np.zeros((n_trials, max_poly))
@@ -79,11 +81,11 @@ def train_models(X_poly, target_sets):
         X_test = X_poly[test_ind]
         y_test = y[test_ind]
 
-        # Fit model with complexity d on dataset k
+        # Fit model with complexity d on target set k
         for d in range(max_poly):
             model.fit(X_train[:, :d + 2], y_train_per_dataset[:, k])
 
-            # Get predictions of model d for dataset k
+            # Get predictions of model d for target set k
             y_train_pred = model.predict(X_train[:, :d + 2])
             y_test_pred = model.predict(X_test[:, :d + 2])
 
@@ -93,7 +95,7 @@ def train_models(X_poly, target_sets):
             train_score = mse(y_train_pred, y_train)
             test_score = mse(y_test_pred, y_test)
 
-            # Save train and test scores for model d and dataset k
+            # Save train and test scores for model d and target set k
             train_scores[k, d] = train_score
             test_scores[k, d] = test_score
 
